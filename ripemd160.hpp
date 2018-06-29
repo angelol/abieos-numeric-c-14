@@ -48,8 +48,8 @@
 
 namespace ripemd160 {
 
-inline constexpr auto ripemd160_digest_size = 20;
-inline constexpr auto ripemd160_magic = 0x9f19dd68u;
+constexpr auto ripemd160_digest_size = 20;
+constexpr auto ripemd160_magic = 0x9f19dd68u;
 
 typedef struct {
     uint32_t magic;
@@ -69,7 +69,7 @@ typedef struct {
 
 /* Initial values for the chaining variables.
  * This is just 0123456789ABCDEFFEDCBA9876543210F0E1D2C3 in little-endian. */
-inline const uint32_t initial_h[5] = {0x67452301u, 0xEFCDAB89u, 0x98BADCFEu, 0x10325476u, 0xC3D2E1F0u};
+const uint32_t initial_h[5] = {0x67452301u, 0xEFCDAB89u, 0x98BADCFEu, 0x10325476u, 0xC3D2E1F0u};
 
 /* Ordering of message words.  Based on the permutations rho(i) and pi(i), defined as follows:
  *
@@ -84,7 +84,7 @@ inline const uint32_t initial_h[5] = {0x67452301u, 0xEFCDAB89u, 0x98BADCFEu, 0x1
  */
 
 /* Left line */
-inline const uint8_t RL[5][16] = {
+const uint8_t RL[5][16] = {
     {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}, /* Round 1: id */
     {7, 4, 13, 1, 10, 6, 15, 3, 12, 0, 9, 5, 2, 14, 11, 8}, /* Round 2: rho */
     {3, 10, 14, 4, 9, 15, 8, 1, 2, 7, 0, 6, 13, 11, 5, 12}, /* Round 3: rho^2 */
@@ -93,7 +93,7 @@ inline const uint8_t RL[5][16] = {
 };
 
 /* Right line */
-inline const uint8_t RR[5][16] = {
+const uint8_t RR[5][16] = {
     {5, 14, 7, 0, 9, 2, 11, 4, 13, 6, 15, 8, 1, 10, 3, 12}, /* Round 1: pi */
     {6, 11, 3, 7, 0, 13, 5, 10, 14, 15, 8, 12, 4, 9, 1, 2}, /* Round 2: rho pi */
     {15, 5, 1, 3, 7, 14, 6, 9, 11, 8, 12, 2, 10, 0, 4, 13}, /* Round 3: rho^2 pi */
@@ -108,7 +108,7 @@ inline const uint8_t RR[5][16] = {
  */
 
 /* Shifts, left line */
-inline const uint8_t SL[5][16] = {
+const uint8_t SL[5][16] = {
     {11, 14, 15, 12, 5, 8, 7, 9, 11, 13, 14, 15, 6, 7, 9, 8}, /* Round 1 */
     {7, 6, 8, 13, 11, 9, 7, 15, 7, 12, 15, 9, 11, 7, 13, 12}, /* Round 2 */
     {11, 13, 6, 7, 14, 9, 13, 15, 14, 8, 13, 6, 5, 12, 7, 5}, /* Round 3 */
@@ -117,7 +117,7 @@ inline const uint8_t SL[5][16] = {
 };
 
 /* Shifts, right line */
-inline const uint8_t SR[5][16] = {
+const uint8_t SR[5][16] = {
     {8, 9, 9, 11, 13, 15, 15, 5, 7, 7, 8, 11, 14, 14, 12, 6}, /* Round 1 */
     {9, 13, 15, 7, 12, 8, 9, 11, 7, 7, 12, 7, 6, 15, 13, 11}, /* Round 2 */
     {9, 7, 15, 11, 8, 6, 6, 14, 12, 13, 5, 14, 13, 13, 7, 5}, /* Round 3 */
@@ -134,7 +134,7 @@ inline const uint8_t SR[5][16] = {
 #define F5(x, y, z) ((x) ^ ((y) | ~(z)))
 
 /* Round constants, left line */
-inline const uint32_t KL[5] = {
+const uint32_t KL[5] = {
     0x00000000u, /* Round 1: 0 */
     0x5A827999u, /* Round 2: floor(2**30 * sqrt(2)) */
     0x6ED9EBA1u, /* Round 3: floor(2**30 * sqrt(3)) */
@@ -143,7 +143,7 @@ inline const uint32_t KL[5] = {
 };
 
 /* Round constants, right line */
-inline const uint32_t KR[5] = {
+const uint32_t KR[5] = {
     0x50A28BE6u, /* Round 1: floor(2**30 * cubert(2)) */
     0x5C4DD124u, /* Round 2: floor(2**30 * cubert(3)) */
     0x6D703EF3u, /* Round 3: floor(2**30 * cubert(5)) */
@@ -151,7 +151,7 @@ inline const uint32_t KR[5] = {
     0x00000000u  /* Round 5: 0 */
 };
 
-inline void ripemd160_init(ripemd160_state* self) {
+void ripemd160_init(ripemd160_state* self) {
 
     memcpy(self->h, initial_h, ripemd160_digest_size);
     memset(&self->buf, 0, sizeof(self->buf));
@@ -161,12 +161,12 @@ inline void ripemd160_init(ripemd160_state* self) {
 }
 
 /* NB: This is not currently called in the hash object's destructor. */
-inline void ripemd160_wipe(ripemd160_state* self) {
+void ripemd160_wipe(ripemd160_state* self) {
     memset(self, 0, sizeof(ripemd160_state));
     self->magic = 0;
 }
 
-inline void byteswap32(uint32_t* v) {
+void byteswap32(uint32_t* v) {
     union {
         uint32_t w;
         uint8_t b[4];
@@ -183,7 +183,7 @@ inline void byteswap32(uint32_t* v) {
     x.w = y.w = 0;
 }
 
-inline void byteswap_digest(uint32_t* p) {
+void byteswap_digest(uint32_t* p) {
     unsigned int i;
 
     for (i = 0; i < 4; i++) {
@@ -195,7 +195,7 @@ inline void byteswap_digest(uint32_t* p) {
 }
 
 /* The RIPEMD160 compression function.  Operates on self->buf */
-inline void ripemd160_compress(ripemd160_state* self) {
+void ripemd160_compress(ripemd160_state* self) {
     uint8_t w, round;
     uint32_t T;
     uint32_t AL, BL, CL, DL, EL; /* left line */
@@ -325,7 +325,7 @@ inline void ripemd160_compress(ripemd160_state* self) {
     self->bufpos = 0;
 }
 
-inline void ripemd160_update(ripemd160_state* self, const unsigned char* p, int length) {
+void ripemd160_update(ripemd160_state* self, const unsigned char* p, int length) {
     unsigned int bytes_needed;
 
     /* Some assertions */
@@ -367,11 +367,11 @@ inline void ripemd160_update(ripemd160_state* self, const unsigned char* p, int 
     }
 }
 
-inline void ripemd160_copy(const ripemd160_state* source, ripemd160_state* dest) {
+void ripemd160_copy(const ripemd160_state* source, ripemd160_state* dest) {
     memcpy(dest, source, sizeof(ripemd160_state));
 }
 
-inline int ripemd160_digest(const ripemd160_state* self, unsigned char* out) {
+int ripemd160_digest(const ripemd160_state* self, unsigned char* out) {
     ripemd160_state tmp;
 
     assert(self->magic == ripemd160_magic);
