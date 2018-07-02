@@ -17,16 +17,14 @@ namespace abieos {
 
 const char base58_chars[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-auto create_base58_map() {
-    std::array<int8_t, 256> base58_map{{0}};
-    for (unsigned i = 0; i < base58_map.size(); ++i)
-        base58_map[i] = -1;
+auto get_base58_map() {
+    std::array<int8_t, 256> map{{0}};
+    for (unsigned i = 0; i < map.size(); ++i)
+        map[i] = -1;
     for (unsigned i = 0; i < sizeof(base58_chars); ++i)
-        base58_map[base58_chars[i]] = i;
-    return base58_map;
+        map[base58_chars[i]] = i;
+    return map;
 }
-
-const auto base58_map = create_base58_map();
 
 template <size_t size>
 bool is_negative(const std::array<uint8_t, size>& a) {
@@ -84,7 +82,7 @@ template <size_t size>
 std::array<uint8_t, size> base58_to_binary(std::string_view s) {
     std::array<uint8_t, size> result{{0}};
     for (auto& src_digit : s) {
-        int carry = base58_map[src_digit];
+        int carry = get_base58_map()[src_digit];
         if (carry < 0)
             eosio_assert(0, "invalid base-58 value");
         for (auto& result_byte : result) {
@@ -105,7 +103,7 @@ std::string binary_to_base58(const std::array<uint8_t, size>& bin) {
     for (auto byte : bin) {
         int carry = byte;
         for (auto& result_digit : result) {
-            int x = (base58_map[result_digit] << 8) + carry;
+            int x = (get_base58_map()[result_digit] << 8) + carry;
             result_digit = base58_chars[x % 58];
             carry = x / 58;
         }
