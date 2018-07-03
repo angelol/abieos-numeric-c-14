@@ -17,13 +17,17 @@ namespace abieos {
 
 const char base58_chars[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
+bool map_initialized = false;
+std::array<int8_t, 256> base58_map{{0}};
 auto get_base58_map() {
-    std::array<int8_t, 256> map{{0}};
-    for (unsigned i = 0; i < map.size(); ++i)
-        map[i] = -1;
-    for (unsigned i = 0; i < sizeof(base58_chars); ++i)
-        map[base58_chars[i]] = i;
-    return map;
+    if(!map_initialized) {
+      for (unsigned i = 0; i < base58_map.size(); ++i)
+          base58_map[i] = -1;
+      for (unsigned i = 0; i < sizeof(base58_chars); ++i)
+          base58_map[base58_chars[i]] = i;
+      map_initialized = true;
+    }
+    return base58_map;
 }
 
 template <size_t size>
